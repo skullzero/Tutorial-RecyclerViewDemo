@@ -1,11 +1,16 @@
 package com.onion.learn.tutorial.recyclerview
 
+import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.onion.learn.tutorial.recyclerview.databinding.ActivityMainBinding
 import com.onion.learn.tutorial.recyclerview.groupie.GroupieRecyclerHeader
 import com.onion.learn.tutorial.recyclerview.groupie.GroupieRecyclerItem
+import com.onion.learn.tutorial.recyclerview.groupie.RecyclerViewItemSwipeCallBack
 import com.onion.learn.tutorial.recyclerview.normal.RecyclerViewAdapter
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Section
@@ -19,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val accountList = listOf(Account("1","Tom"), Account("2", "Jerry"))
 
         //normal RecyclerView
@@ -45,5 +49,21 @@ class MainActivity : AppCompatActivity() {
         section2.add(GroupieRecyclerItem(Account("3","Tom2")))
         section2.add(GroupieRecyclerItem(Account("4", "Jerry2")))
         groupAdapter.add(section2)
+
+        //item touch action
+        val swipeCallBack = RecyclerViewItemSwipeCallBack()
+        val itemHelper = ItemTouchHelper(swipeCallBack)
+        itemHelper.attachToRecyclerView(binding.xwrayRecyclerView)
+        binding.xwrayRecyclerView.addItemDecoration(object: RecyclerView.ItemDecoration() {
+            override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                swipeCallBack.onDraw(c, this@MainActivity)
+            }
+        })
+
+        swipeCallBack.isSwipeLeftDone.observe(this) {
+            if(it) {
+                Toast.makeText(this, "Swipe Left Done!!!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
